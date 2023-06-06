@@ -1,10 +1,46 @@
 import { Component } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+
+interface AddressFromApi {
+  cep: string;
+  logradouro: string;
+  complemento: string;
+  bairro: string;
+  localidade: string;
+  uf: string;
+  ibge: string;
+  gia: string;
+  ddd: string;
+  siafi: string;
+}
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  title = 'angular-exemple';
+  cep = '';
+  street = '';
+  number = '';
+  complement = '';
+  uf = '';
+  city = '';
+  neighborhood = '';
+
+  constructor(private http: HttpClient) {}
+
+  onInputCep = () => {
+    if (this.cep.length === 8) {
+      this.http
+        .get<AddressFromApi>(`https://viacep.com.br/ws/${this.cep}/json/`)
+        .subscribe((data) => {
+          this.street = data.logradouro;
+          this.complement = data.complemento;
+          this.uf = data.uf;
+          this.city = data.localidade;
+          this.neighborhood = data.bairro;
+        });
+    }
+  };
 }
